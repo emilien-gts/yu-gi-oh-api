@@ -19,4 +19,9 @@ trait IdTrait
     {
         return $this->id;
     }
+
+    public function getIdString(): ?string
+    {
+        return $this->id?->toRfc4122();
+    }
 }

@@ -19,3 +19,5 @@
 
 /docker/db/
 /.idea/
+
+/public/uploads/
