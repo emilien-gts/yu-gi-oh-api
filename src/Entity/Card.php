@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Enum\Card\CardAttribute;
 use App\Enum\Card\CardRarity;
 use App\Enum\Card\CardType;
@@ -15,7 +14,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CardRepository::class)]
-#[ApiResource]
 class Card
 {
     use IdTrait;
