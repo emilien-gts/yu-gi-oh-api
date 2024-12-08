@@ -18,15 +18,13 @@ help: ## Outputs this help screen
 	@grep -E '(^[a-zA-Z0-9\./_-]+:.*?##.*$$)|(^##)' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' | sed -e 's/\[32m##/[33m/'
 
 ## —— Docker 🐳 ————————————————————————————————————————————————————————————————
-dc-install: dc-down dc-start vendor db-reset-f importmap-install ## Install project
+dc-install: dc-down dc-up vendor db-reset-f ## Install project
 
 dc-build: ## Builds the Docker images
 	@$(DOCKER_COMP) build
 
 dc-up: ## Start the docker hub in detached mode (no logs)
 	@$(DOCKER_COMP) up -d --remove-orphans
-
-dc-start: dc-build dc-up ## Build and start the containers
 
 dc-down: ## Stop the docker hub
 	@$(DOCKER_COMP) down --remove-orphans
@@ -55,7 +53,7 @@ cc: c=c:c ## Clear the cache
 cc: sf
 
 db-reset: db-drop db-create db-update
-db-reset-f: db-reset db-fixtures-append
+db-reset-f: db-reset
 
 db-create: ##  Create database
 	@$(SYMFONY) doctrine:database:create --if-not-exists
@@ -66,19 +64,16 @@ db-drop: ##  Drop database
 db-update: ## Update database
 	@$(SYMFONY) doctrine:schema:update --force --dump-sql --complete
 
-db-fixtures-append: ##  Append fixtures
-	@$(SYMFONY) doctrine:fixture:load -q --append
-
 validate-schema: ## Valid doctrine mapping
 	@$(SYMFONY) doctrine:schema:validate --skip-sync
 
 ## —— PHP 🐘 ——————————————————————————————————————————————————————————————————
 
 test: ## Test phpunit
-	@$(PHP) bin/phpunit tests -v --testdox
+	@$(PHP) bin/phpunit tests
 
 analyse-php: ## Analyse php
-	@$(SYM_CONT) ./vendor/bin/phpstan analyse -c phpstan.neon
+	@$(SYM_CONT) ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=4048M
 
 lint-php: ## Lint php
 	@$(SYM_CONT) ./vendor/bin/php-cs-fixer fix --dry-run --diff
@@ -87,11 +82,3 @@ fix-php: ## Fix php
 	@$(SYM_CONT) ./vendor/bin/php-cs-fixer fix
 
 check: fix-php analyse-php validate-schema test
-
-## —— Assets 💄 ———————————————————————————————————————————————————————————————————
-
-importmap-install:
-	@$(SYMFONY) importmap:install
-
-compile-asset:
-	@$(SYMFONY) asset-map:compile

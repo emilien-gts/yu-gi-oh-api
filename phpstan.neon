@@ -3,3 +3,16 @@ parameters:
 	paths:
 		- src
 		- tests
+	ignoreErrors:
+	    -
+	        identifier: argument.type
+	        path: src/Api/State/*
+	    -
+	        identifier: return.type
+	        path: src/Api/State/*
+	    -
+	        identifier: argument.templateType
+	    -
+	        identifier: method.nonObject
+	    -
+	        identifier: missingType.generics

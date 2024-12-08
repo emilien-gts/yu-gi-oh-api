@@ -2,12 +2,12 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Metadata\ApiResource;
 use App\Enum\Card\CardAttribute;
 use App\Enum\Card\CardRarity;
 use App\Enum\Card\CardType;
 use App\Model\IdTrait;
 use App\Repository\CardRepository;
+use App\Validator\CardConstraint;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -15,7 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CardRepository::class)]
-#[ApiResource]
+#[CardConstraint]
 class Card
 {
     use IdTrait;
@@ -39,6 +39,9 @@ class Card
     #[ORM\Column(length: 50, nullable: true)]
     private ?CardAttribute $attribute = null;
 
+    /**
+     * @var array<CardType>|null
+     */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $types = null;
 
@@ -54,7 +57,7 @@ class Card
     #[ORM\Column(length: 8, unique: true)]
     private ?string $password = null;
 
-    #[ORM\ManyToOne(inversedBy: 'cards')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'cards')]
     #[ORM\JoinColumn(nullable: false)]
     private ?CardSet $set = null;
 
@@ -146,23 +149,24 @@ class Card
             return [];
         }
 
-        return \array_map(fn (string $type) => CardType::from($type), $this->types);
-    }
-
-    /**
-     * @param string[] $types
-     */
-    public function setTypes(array $types): void
-    {
-        $_types = [];
-        foreach ($types as $type) {
-            $type = trim($type);
-            if (null !== CardType::tryFrom($type)) {
-                $_types[] = $type;
+        $types = [];
+        /** @var string $type */
+        foreach ($this->types as $type) {
+            $case = CardType::tryFrom($type);
+            if ($case instanceof CardType) {
+                $types[] = $case;
             }
         }
 
-        $this->types = \array_unique(\array_values($_types));
+        return $types;
+    }
+
+    /**
+     * @param CardType[] $types
+     */
+    public function setTypes(array $types): void
+    {
+        $this->types = $types;
     }
 
     public function getLevel(): ?int

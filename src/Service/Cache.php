@@ -12,8 +12,12 @@ use App\Repository\OptionRepository;
 
 class Cache
 {
-    /** @var array<string, mixed> */
-    private array $_data = [];
+    /** @var array{card_set: array<string, CardSet>, card: array<string, Card>, option: array<string, array<string, Option>>} */
+    private array $_data = [
+        'card_set' => [],
+        'card' => [],
+        'option' => [],
+    ];
 
     public function __construct(
         private readonly CardSetRepository $cardSetRepository,
@@ -48,13 +52,17 @@ class Cache
             $this->_data['card'][$object->getName()] = $object;
         }
 
-        if ($object instanceof Option) {
+        if ($object instanceof Option && null !== $object->getCategory()) {
             $this->_data['option'][$object->getCategory()->value][$object->getLabel()] = $object;
         }
     }
 
     public function clear(): void
     {
-        $this->_data = [];
+        $this->_data = [
+            'card_set' => [],
+            'card' => [],
+            'option' => [],
+        ];
     }
 }

@@ -29,7 +29,6 @@ use Symfony\Component\Filesystem\Filesystem;
 class ImportCommand extends Command
 {
     private const int BATCH_SIZE = 500;
-    private const string IMAGE_PATH = './Resources/images';
 
     private ?SymfonyStyle $io = null;
     private Filesystem $fs;
@@ -87,6 +86,7 @@ class ImportCommand extends Command
                 break;
             }
 
+            /** @var string[] $record */
             foreach ($records as $record) {
                 $this->importLine(\array_values($record));
             }
@@ -103,6 +103,9 @@ class ImportCommand extends Command
         return self::SUCCESS;
     }
 
+    /**
+     * @param string[] $data
+     */
     private function importLine(array $data): void
     {
         $set = $this->importCardSet($data);
@@ -111,6 +114,9 @@ class ImportCommand extends Command
         $set->addCard($card);
     }
 
+    /**
+     * @param string[] $data
+     */
     private function importCardSet(array $data): CardSet
     {
         $setName = \trim($data[1]);
@@ -127,6 +133,9 @@ class ImportCommand extends Command
         return $set;
     }
 
+    /**
+     * @param string[] $data
+     */
     private function importCard(array $data): Card
     {
         $name = \trim($data[4]);
@@ -163,9 +172,16 @@ class ImportCommand extends Command
         }
 
         $types = \array_map('trim', \explode('/', $data[8]));
-        if (!empty($types)) {
-            $card->setTypes($types);
+        $_types = [];
+        foreach ($types as $type) {
+            $type = \trim($type);
+            $case = CardType::tryFrom($type);
+            if (null !== $case && !\in_array($case, $_types)) {
+                $_types[] = CardType::from($type);
+            }
         }
+
+        $card->setTypes($_types);
 
         $level = \trim($data[9]);
         $card->setLevel(empty($level) ? null : \intval($level));
@@ -181,10 +197,12 @@ class ImportCommand extends Command
             $card->setPassword($password);
         }
 
-        $statuses = \preg_split('/\s*,\s*/', \preg_replace('/[\[\]\']/', '', $data[12]));
-        foreach ($statuses as $status) {
-            $option = $this->importCardStatus($status);
-            $card->addStatus($option);
+        $statuses = \preg_split('/\s*,\s*/', \preg_replace('/[\[\]\']/', '', $data[12]) ?? '');
+        if (is_array($statuses)) {
+            foreach ($statuses as $status) {
+                $option = $this->importCardStatus($status);
+                $card->addStatus($option);
+            }
         }
 
         // image
@@ -192,9 +210,9 @@ class ImportCommand extends Command
         $exists = $this->fs->exists(\sprintf('%s/%s', $this->imagesDirectory, $_image));
 
         if ($exists) {
-            $copy = \sprintf('%s/%s', $this->imagesDirectory, $_image);
+            $from = \sprintf('%s/%s', $this->imagesDirectory, $_image);
             $to = \sprintf('%s/%s', $this->publicDirectory, $_image);
-            $this->fs->copy($copy, $to, true);
+            $this->fs->copy($from, $to, true);
 
             $card->setImageFilename($_image);
         }
