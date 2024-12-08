@@ -1,0 +1,24 @@
+{
+  "@context": "/api/contexts/Card",
+  "@id": "@string@",
+  "@type": "Card",
+  "id": "@uuid@",
+  "name": "@string@",
+  "rarity": "@string@",
+  "number": "@string@",
+  "otherName": "@string@||@null@",
+  "type": "@string@",
+  "attribute": "@string@||@null@",
+  "types": "@array@",
+  "level": "@integer@||@null@",
+  "attack": "@integer@||@null@",
+  "defense": "@integer@||@null@",
+  "password": "@string@||@null@",
+  "set": {
+    "@id": "@string@",
+    "@type": "CardSet",
+    "id": "@uuid@",
+    "name": "@string@"
+  },
+  "imageUrl": "@string@||@null@"
+}

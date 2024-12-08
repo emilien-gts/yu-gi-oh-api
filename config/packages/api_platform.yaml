@@ -3,5 +3,9 @@ api_platform:
     version: 1.0.0
     defaults:
         stateless: true
+        normalization_context:
+          skip_null_values: false
         cache_headers:
             vary: ['Content-Type', 'Authorization', 'Origin']
+    resource_class_directories:
+      - '%kernel.project_dir%/src/Api/Resource'

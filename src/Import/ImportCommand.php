@@ -192,9 +192,9 @@ class ImportCommand extends Command
         $exists = $this->fs->exists(\sprintf('%s/%s', $this->imagesDirectory, $_image));
 
         if ($exists) {
-            $copy = \sprintf('%s/%s', $this->imagesDirectory, $_image);
+            $from = \sprintf('%s/%s', $this->imagesDirectory, $_image);
             $to = \sprintf('%s/%s', $this->publicDirectory, $_image);
-            $this->fs->copy($copy, $to, true);
+            $this->fs->copy($from, $to, true);
 
             $card->setImageFilename($_image);
         }

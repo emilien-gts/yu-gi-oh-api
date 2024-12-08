@@ -55,7 +55,7 @@ cc: c=c:c ## Clear the cache
 cc: sf
 
 db-reset: db-drop db-create db-update
-db-reset-f: db-reset db-fixtures-append
+db-reset-f: db-reset
 
 db-create: ##  Create database
 	@$(SYMFONY) doctrine:database:create --if-not-exists
@@ -66,19 +66,16 @@ db-drop: ##  Drop database
 db-update: ## Update database
 	@$(SYMFONY) doctrine:schema:update --force --dump-sql --complete
 
-db-fixtures-append: ##  Append fixtures
-	@$(SYMFONY) doctrine:fixture:load -q --append
-
 validate-schema: ## Valid doctrine mapping
 	@$(SYMFONY) doctrine:schema:validate --skip-sync
 
 ## —— PHP 🐘 ——————————————————————————————————————————————————————————————————
 
 test: ## Test phpunit
-	@$(PHP) bin/phpunit tests -v --testdox
+	@$(PHP) bin/phpunit tests
 
 analyse-php: ## Analyse php
-	@$(SYM_CONT) ./vendor/bin/phpstan analyse -c phpstan.neon
+	@$(SYM_CONT) ./vendor/bin/phpstan analyse -c phpstan.neon --memory-limit=4048M
 
 lint-php: ## Lint php
 	@$(SYM_CONT) ./vendor/bin/php-cs-fixer fix --dry-run --diff
