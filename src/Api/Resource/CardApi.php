@@ -2,7 +2,9 @@
 
 namespace App\Api\Resource;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use ApiPlatform\Doctrine\Orm\State\Options;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiProperty;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
@@ -63,6 +65,9 @@ use Symfony\Component\Validator\Constraints as Assert;
     processor: CardImageProcessor::class,
     stateOptions: new Options(entityClass: Card::class)
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'name' => 'partial', 'otherName' => 'partial', 'password' => 'exact', 'set' => 'exact',
+])]
 class CardApi
 {
     #[ApiProperty(writable: false, identifier: true)]

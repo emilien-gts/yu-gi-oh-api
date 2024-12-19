@@ -21,4 +21,4 @@ The project uses Docker for development and deployment, with a Makefile to handl
 
 ### Project Status
 
-The API is considered complete. I might add things like filters or new features to test certain parts of API Platform in the future.
+The API is considered complete. I might add new features to test certain parts of API Platform in the future.

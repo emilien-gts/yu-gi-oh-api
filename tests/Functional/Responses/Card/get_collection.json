@@ -28,5 +28,14 @@
       "imageUrl": "@string@||@null@"
     },
     "@...@"
-  ]
+  ],
+  "view": {
+    "@*@": "@*@"
+  },
+  "search": {
+    "@type": "IriTemplate",
+    "template": "@string@",
+    "variableRepresentation": "@string@",
+    "mapping": "@array@"
+  }
 }

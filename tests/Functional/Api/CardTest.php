@@ -28,6 +28,48 @@ class CardTest extends BaseApiTestCase
     }
 
     #[Test]
+    public function get_collection_with_filters(): void
+    {
+        /** @var Card $card */
+        $card = CardFactory::createOne(['name' => 'Dark Magician', 'password' => '46986414'])->_save()->_real();
+        CardFactory::createOne(['name' => 'Dark Magician Girl', 'password' => '38033121']);
+        CardFactory::createMany(5);
+
+        // filter by name (partial)
+        $endpoint = \sprintf('%s?name=Magician', self::BASE_URL);
+        $this->client->request(Request::METHOD_GET, $endpoint);
+
+        $response = $this->client->getResponse();
+        $this->assertResponse($response, 'Card/get_collection');
+
+        /** @var array{totalItems: int} $content */
+        $content = \json_decode($response->getContent() ?: '', true);
+        $this->assertSame(2, $content['totalItems']);
+
+        // filter by password (exact)
+        $endpoint = \sprintf('%s?password=%s', self::BASE_URL, '38033121');
+        $this->client->request(Request::METHOD_GET, $endpoint);
+
+        $response = $this->client->getResponse();
+        $this->assertResponse($response, 'Card/get_collection');
+
+        /** @var array{totalItems: int} $content */
+        $content = \json_decode($response->getContent() ?: '', true);
+        $this->assertSame(1, $content['totalItems']);
+
+        // filter by set (exact)
+        $endpoint = \sprintf('%s?set=%s', self::BASE_URL, $card->getSet()->getIdString());
+        $this->client->request(Request::METHOD_GET, $endpoint);
+
+        $response = $this->client->getResponse();
+        $this->assertResponse($response, 'Card/get_collection');
+
+        /** @var array{totalItems: int} $content */
+        $content = \json_decode($response->getContent() ?: '', true);
+        $this->assertSame(1, $content['totalItems']);
+    }
+
+    #[Test]
     public function get_item(): void
     {
         /** @var Card $card */
