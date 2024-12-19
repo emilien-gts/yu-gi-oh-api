@@ -58,7 +58,7 @@ class Card
     private ?string $password = null;
 
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'cards')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?CardSet $set = null;
 
     /**

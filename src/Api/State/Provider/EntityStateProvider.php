@@ -13,8 +13,8 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class EntityStateProvider extends BaseProvider
 {
     public function __construct(
-        protected readonly CollectionProvider $collectionProvider,
-        protected readonly ItemProvider $itemProvider,
+        private readonly CollectionProvider $collectionProvider,
+        private readonly ItemProvider $itemProvider,
     ) {
     }
 

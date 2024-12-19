@@ -4,6 +4,7 @@ namespace App\Api\State\Processor;
 
 use ApiPlatform\Doctrine\Common\State\PersistProcessor;
 use ApiPlatform\Doctrine\Common\State\RemoveProcessor;
+use ApiPlatform\Doctrine\Orm\State\ItemProvider;
 use ApiPlatform\Doctrine\Orm\State\Options;
 use ApiPlatform\Metadata\DeleteOperationInterface;
 use ApiPlatform\Metadata\Operation;
@@ -16,8 +17,9 @@ use Symfony\Component\DependencyInjection\Attribute\Autowire;
 class EntityStateProcessor extends BaseProcessor
 {
     public function __construct(
-        #[Autowire(service: PersistProcessor::class)] protected ProcessorInterface $persistProcessor,
-        #[Autowire(service: RemoveProcessor::class)] protected ProcessorInterface $removeProcessor,
+        #[Autowire(service: PersistProcessor::class)] private readonly ProcessorInterface $persistProcessor,
+        #[Autowire(service: RemoveProcessor::class)] private readonly ProcessorInterface $removeProcessor,
+        private readonly ItemProvider $itemProvider,
     ) {
     }
 
@@ -27,20 +29,19 @@ class EntityStateProcessor extends BaseProcessor
         \assert($stateOptions instanceof Options);
 
         $entityFqcn = $stateOptions->getEntityClass();
-        if ($operation instanceof Patch) {
-            $entity = $this->em->find($entityFqcn, $uriVariables['id']);
-            if (null === $entity) {
-                throw new \RuntimeException('Entity not found');
-            }
-        }
-
-        $entity = $this->autoMapper->map($data, $entity ?? $entityFqcn);
 
         if ($operation instanceof DeleteOperationInterface) {
+            $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
             $this->removeProcessor->process($entity, $operation, $uriVariables, $context);
 
             return null;
         }
+
+        if ($operation instanceof Patch) {
+            $entity = $this->itemProvider->provide($operation, $uriVariables, $context);
+        }
+
+        $entity = $this->autoMapper->map($data, $entity ?? $entityFqcn);
 
         $violations = $this->validator->validate($entity);
         if ($violations->count() > 0) {

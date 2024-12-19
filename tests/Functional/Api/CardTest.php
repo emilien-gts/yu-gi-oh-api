@@ -57,7 +57,7 @@ class CardTest extends BaseApiTestCase
             'otherName' => CardFactory::faker()->text(255),
             'password' => '92223430',
             'rarity' => CardFactory::faker()->randomElement(CardRarity::cases()),
-            'set' => \sprintf('/api/card_sets/%s', $set->getIdString()),
+            'set' => \sprintf('/api/sets/%s', $set->getIdString()),
             'type' => CardFactory::faker()->randomElement(CardType::cases()),
             'types' => [
                 CardType::ROCK->value,
@@ -91,7 +91,7 @@ class CardTest extends BaseApiTestCase
                 'otherName' => CardFactory::faker()->text(255),
                 'password' => '92223430',
                 'rarity' => CardFactory::faker()->randomElement(CardRarity::cases()),
-                'set' => \sprintf('/api/card_sets/%s', $set->getIdString()),
+                'set' => \sprintf('/api/sets/%s', $set->getIdString()),
                 'type' => CardFactory::faker()->randomElement(CardType::cases()),
                 'types' => [
                     CardType::ROCK->value,

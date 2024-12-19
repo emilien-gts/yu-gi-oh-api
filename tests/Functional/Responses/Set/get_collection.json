@@ -1,0 +1,15 @@
+{
+  "@context": "/api/contexts/CardSet",
+  "@id": "/api/sets",
+  "@type": "Collection",
+  "totalItems": "@integer@",
+  "member": [
+    {
+      "@id": "@string@",
+      "@type": "CardSet",
+      "id": "@uuid@",
+      "name": "@string@"
+    },
+    "@...@"
+  ]
+}
